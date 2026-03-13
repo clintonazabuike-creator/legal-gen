@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Official Document Generator & Signer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <style>
+        .signature-font { font-family: 'Dancing Script', cursive; }
+        .seal-font { font-family: 'Cinzel', serif; }
+        .legal-page { font-family: 'Times New Roman', Times, serif; }
+        .stamp-circle {
+            border: 4px double rgba(185, 28, 28, 0.6);
+            border-radius: 50%;
+            color: rgba(185, 28, 28, 0.6);
+            transform: rotate(-15deg);
+        }
+    </style>
+</head>
+<body class="bg-slate-800 min-h-screen p-2 md:p-8">
+
+<div id="app" class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-6">
+    
+    <div class="lg:col-span-4 bg-white p-6 rounded-lg shadow-2xl h-fit">
+        <h1 class="text-2xl font-black text-slate-800 mb-6 border-b-4 border-red-600 pb-2">LEGAL GENERATOR</h1>
+        
+        <div class="space-y-5">
+            <div>
+                <label class="block text-sm font-bold text-slate-700">Document Type</label>
+                <select v-model="selectedTemplate" class="w-full p-3 border-2 border-slate-200 rounded-lg bg-slate-50 font-semibold">
+                    <option v-for="t in templates" :value="t">{{ t.name }}</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Select Department Seal</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button v-for="l in logos" @click="activeLogo = l" 
+                        :class="activeLogo.id === l.id ? 'bg-red-700 text-white shadow-inner' : 'bg-slate-100 text-slate-600'"
+                        class="p-3 text-xs font-bold rounded-md border-2 transition uppercase tracking-tighter">
+                        {{ l.name }}
+                    </button>
+                </div>
+            </div>
+
+            <div class="border-t-2 pt-4 space-y-4">
+                <div v-for="field in selectedTemplate.fields" :key="field">
+                    <label class="block text-[10px] font-black text-red-600 uppercase tracking-widest">{{ field.replace('_', ' ') }}</label>
+                    <input type="text" v-model="formData[field]" 
+                        class="w-full p-2 border-b-2 border-slate-200 bg-transparent focus:border-red-600 outline-none transition text-sm" 
+                        :placeholder="'Enter ' + field">
+                </div>
+            </div>
+
+            <button @click="generatePDF" class="w-full mt-4 bg-red-700 text-white font-black py-4 rounded-xl hover:bg-red-800 transition-all shadow-xl transform active:scale-95">
+                GENERATE & STAMP PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="lg:col-span-8 bg-white shadow-2xl p-16 legal-page relative min-h-[1000px] border-[16px] border-slate-100">
+        <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
+            <h1 class="text-[120px] font-bold -rotate-45 uppercase">Official Copy</h1>
+        </div>
+
+        <div class="text-center mb-16">
+            <div class="text-6xl mb-4 text-slate-800">{{ activeLogo.icon }}</div>
+            <h3 class="text-xl font-bold uppercase tracking-[0.3em] seal-font">{{ activeLogo.authority }}</h3>
+            <p class="text-xs font-bold text-slate-500 uppercase">Registered Document Division</p>
+            <div class="flex items-center justify-center mt-4">
+                <div class="h-[2px] w-20 bg-slate-300"></div>
+                <div class="mx-4 text-slate-400">◆</div>
+                <div class="h-[2px] w-20 bg-slate-300"></div>
+            </div>
+        </div>
+
+        <h2 class="text-3xl text-center font-bold uppercase underline decoration-double mb-12 tracking-tight">
+            {{ selectedTemplate.name }}
+        </h2>
+
+        <div class="text-xl leading-[2.2] text-justify mb-24 px-4 text-slate-900">
+            {{ processedBody }}
+        </div>
+
+        <div class="grid grid-cols-2 mt-auto relative">
+            <div class="z-10">
+                <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Official Endorsement</p>
+                <div class="signature-font text-5xl py-2 h-20 text-blue-900">
+                    {{ formData['Signer_Name'] }}
+                </div>
+                <div class="border-t-2 border-slate-900 w-64 pt-2">
+                    <p class="font-bold uppercase tracking-tighter">{{ formData['Signer_Name'] || 'Authorized Signer' }}</p>
+                    <p class="text-xs text-slate-500">Legal Representative</p>
+                </div>
+            </div>
+
+            <div class="absolute left-40 -top-10 w-40 h-40 stamp-circle flex items-center justify-center p-4 text-center z-0 pointer-events-none">
+                <div class="seal-font text-[10px] font-bold uppercase leading-tight">
+                    {{ activeLogo.name }}<br>
+                    VERIFIED<br>
+                    {{ new Date().getFullYear() }}
+                </div>
+            </div>
+
+            <div class="flex flex-col justify-end text-right">
+                <p class="text-sm font-bold">Document Ref: <span class="text-red-700">{{ refId }}</span></p>
+                <p class="text-sm font-bold italic">Signed on {{ new Date().toLocaleDateString() }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const { createApp } = Vue;
+const { jsPDF } = window.jspdf;
+
+createApp({
+    data() {
+        return {
+            refId: Math.random().toString(36).substr(2, 9).toUpperCase(),
+            activeLogo: { id: 'court', name: 'Federal Court', authority: 'Supreme Judicial Registry', icon: '⚖️' },
+            formData: { Signer_Name: '' },
+            logos: [
+                { id: 'court', name: 'Federal Court', authority: 'Supreme Judicial Registry', icon: '⚖️' },
+                { id: 'bank', name: 'Reserve Bank', authority: 'Financial Oversight Bureau', icon: '🏦' },
+                { id: 'transfer', name: 'Land Registry', authority: 'Deed & Title Commission', icon: '📜' },
+                { id: 'order', name: 'Executive Dept', authority: 'Office of Enforcement', icon: '🏛️' }
+            ],
+            templates: [
+                { 
+                    name: 'Transfer of Ownership', 
+                    fields: ['Seller_Name', 'Buyer_Name', 'Asset_Description', 'Price', 'Signer_Name'],
+                    body: 'I, {{Seller_Name}}, do hereby irrevocably transfer and convey full legal ownership of the property/asset described as {{Asset_Description}} to {{Buyer_Name}} for the total consideration of {{Price}}. The undersigned warrants that the title is free of all encumbrances and liabilities.'
+                },
+                { 
+                    name: 'Court Restraining Order', 
+                    fields: ['Case_Ref', 'Subject_Name', 'Protected_Party', 'Prohibited_Acts', 'Signer_Name'],
+                    body: 'In the matter of {{Case_Ref}}, it is hereby ordered that {{Subject_Name}} shall immediately cease and desist all {{Prohibited_Acts}} against {{Protected_Party}}. Failure to comply will result in immediate legal sanctions.'
+                },
+                { 
+                    name: 'Stock Purchase Agreement', 
+                    fields: ['Investor_Name', 'Company_Entity', 'Share_Quantity', 'Investment_Value', 'Signer_Name'],
+                    body: 'This agreement confirms that {{Investor_Name}} has acquired {{Share_Quantity}} shares in {{Company_Entity}} for the total sum of {{Investment_Value}}. This transaction is recorded in the official corporate ledger.'
+                },
+                { 
+                    name: 'Final Clearance', 
+                    fields: ['Entity_Name', 'Contract_Ref', 'Settlement_Date', 'Signer_Name'],
+                    body: 'This document certifies that {{Entity_Name}} has fulfilled all contractual obligations regarding {{Contract_Ref}} as of {{Settlement_Date}}. All accounts are hereby settled in full.'
+                }
+            ],
+            selectedTemplate: null
+        }
+    },
+    created() {
+        this.selectedTemplate = this.templates[0];
+    },
+    computed: {
+        processedBody() {
+            let text = this.selectedTemplate.body;
+            this.selectedTemplate.fields.forEach(f => {
+                const val = this.formData[f] ? this.formData[f] : `[ ${f.replace('_', ' ')} ]`;
+                text = text.replace(new RegExp(`{{${f}}}`, 'g'), val);
+            });
+            return text;
+        }
+    },
+    methods: {
+        generatePDF() {
+            const doc = new jsPDF();
+            
+            // Draw Official Red Stamp (Vector circle)
+            doc.setDrawColor(185, 28, 28);
+            doc.setLineWidth(1);
+            doc.circle(70, 240, 20); // The Stamp Circle
+            doc.setFontSize(8);
+            doc.setTextColor(185, 28, 28);
+            doc.text("OFFICIAL SEAL", 70, 238, { align: "center", angle: -15 });
+            doc.text("VERIFIED", 70, 242, { align: "center", angle: -15 });
+
+            // Document Header
+            doc.setTextColor(40, 40, 40);
+            doc.setFont("times", "bold");
+            doc.setFontSize(10);
+            doc.text(this.activeLogo.authority.toUpperCase(), 105, 30, { align: "center" });
+            
+            doc.setFontSize(22);
+            doc.text(this.selectedTemplate.name.toUpperCase(), 105, 50, { align: "center" });
+            
+            // Content
+            doc.setFont("times", "normal");
+            doc.setFontSize(12);
+            const splitText = doc.splitTextToSize(this.processedBody, 160);
+            doc.text(splitText, 25, 80, { lineHeightFactor: 1.8 });
+            
+            // Signature Line
+            const y = 240;
+            doc.setFont("times", "italic");
+            doc.setFontSize(24);
+            doc.setTextColor(20, 40, 100); // Blue ink for signature
+            doc.text(this.formData.Signer_Name || "Signer", 25, y);
+            
+            doc.setTextColor(0, 0, 0);
+            doc.setDrawColor(0, 0, 0);
+            doc.line(25, y+2, 90, y+2);
+            
+            doc.setFont("times", "bold");
+            doc.setFontSize(10);
+            doc.text("AUTHORIZED REPRESENTATIVE", 25, y+8);
+            doc.text("DATE: " + new Date().toLocaleDateString(), 140, y+8);
+            doc.text("REF: " + this.refId, 140, y+14);
+
+            doc.save(`${this.selectedTemplate.name}.pdf`);
+        }
+    }
+}).mount('#app');
+</script>
+</body>
+  </html>
+
