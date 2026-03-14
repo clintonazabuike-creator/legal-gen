@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sovereign Legal Instrument - Ultra Edition</title>
+    <title>Supreme Sovereign Instrument Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -12,116 +12,82 @@
         .sig-font { font-family: 'Dancing Script', cursive; }
         .header-font { font-family: 'Cinzel', serif; }
         .body-font { font-family: 'Libre Baskerville', serif; }
-        .paper-bond {
-            background-color: #fdfdfb;
-            background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
-            box-shadow: 0 0 50px rgba(0,0,0,0.3);
-        }
-        .legal-rules {
-            border-left: 2px solid #991b1b;
-            border-right: 1px solid #e2e8f0;
-        }
-        /* Scoped Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+        .paper-bond { background-color: #fdfdfb; background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png"); }
     </style>
 </head>
-<body class="bg-[#1a1a1a] min-h-screen p-4 body-font text-zinc-300">
+<body class="bg-[#0f172a] min-h-screen p-4 body-font text-slate-300">
 
-<div id="app" class="max-w-[1800px] mx-auto grid lg:grid-cols-12 gap-8">
+<div id="app" class="max-w-[1700px] mx-auto grid lg:grid-cols-12 gap-8">
     
-    <div class="lg:col-span-4 bg-[#262626] p-8 rounded-3xl shadow-2xl h-[92vh] overflow-y-auto custom-scrollbar border border-zinc-800">
-        <div class="mb-10">
-            <h1 class="header-font text-3xl tracking-widest text-amber-500 font-black">LEX SUPREME</h1>
-            <div class="h-1 w-20 bg-amber-600 mt-2"></div>
-            <p class="text-[10px] uppercase tracking-[0.5em] text-zinc-500 mt-2 font-bold">Encrypted Client-Side Execution</p>
-        </div>
-
+    <div class="lg:col-span-4 bg-[#1e293b] p-8 rounded-3xl shadow-2xl h-[92vh] overflow-y-auto border border-slate-700">
+        <h1 class="header-font text-2xl text-amber-500 mb-2">LEX SUPREME</h1>
+        <p class="text-[10px] uppercase tracking-[0.4em] text-slate-500 mb-8 font-bold">Base64 Integrated System</p>
+        
         <div class="space-y-8">
+            <section class="p-4 bg-slate-900/50 border-2 border-dashed border-slate-700 rounded-xl text-center">
+                <label class="block text-xs font-black uppercase text-amber-500 mb-2">Authority Seal (Upload Image)</label>
+                <input type="file" @change="handleLogoUpload" class="hidden" id="logoUpload" accept="image/*">
+                <label for="logoUpload" class="cursor-pointer bg-slate-800 hover:bg-amber-600 hover:text-slate-900 p-2 px-4 rounded text-[10px] font-bold transition inline-block">
+                    SELECT OFFICIAL CREST
+                </label>
+                <div v-if="customLogo" class="mt-2 text-emerald-400 text-[10px]">✔ Logo Loaded Successfully</div>
+            </section>
+
             <section>
-                <label class="block text-xs font-black uppercase text-amber-500 mb-3 tracking-widest">Instrument Selection</label>
-                <select v-model="selectedTemplate" class="w-full p-4 bg-zinc-900 border border-zinc-700 rounded-xl text-zinc-100 outline-none focus:ring-2 focus:ring-amber-500 transition font-bold">
+                <label class="block text-xs font-black uppercase text-amber-500 mb-3 tracking-widest">Instrument Type</label>
+                <select v-model="selectedTemplate" class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 outline-none">
                     <option v-for="t in templates" :value="t">{{ t.name }}</option>
                 </select>
             </section>
 
-            <section>
-                <label class="block text-xs font-black uppercase text-amber-500 mb-3 tracking-widest">Authority Jurisdiction</label>
-                <div class="grid grid-cols-2 gap-3">
-                    <button v-for="l in logos" @click="activeLogo = l" 
-                        :class="activeLogo.id === l.id ? 'border-amber-500 bg-amber-500 text-zinc-900 shadow-lg' : 'border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-500'"
-                        class="p-4 text-[10px] font-black rounded-xl border-2 uppercase transition-all flex flex-col items-center gap-2">
-                        <span class="text-xl">{{ l.icon }}</span>
-                        {{ l.name }}
-                    </button>
-                </div>
-            </section>
-
-            <section class="space-y-4 pt-6 border-t border-zinc-800">
-                <label class="block text-xs font-black uppercase text-amber-500 tracking-widest">Document Particulars</label>
+            <section class="space-y-4 pt-4">
                 <div v-for="field in selectedTemplate.fields" :key="field">
-                    <label class="block text-[9px] font-black text-zinc-500 uppercase mb-1 tracking-wider">{{ field.replace(/_/g, ' ') }}</label>
-                    <input type="text" v-model="formData[field]" 
-                        class="w-full p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-200 focus:border-amber-500 outline-none transition shadow-inner">
+                    <label class="block text-[9px] font-black text-slate-500 uppercase mb-1">{{ field.replace(/_/g, ' ') }}</label>
+                    <input type="text" v-model="formData[field]" class="w-full p-3 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 outline-none">
                 </div>
             </section>
 
-            <button @click="generatePDF" class="w-full bg-amber-600 hover:bg-amber-500 text-zinc-950 font-black py-6 rounded-2xl shadow-[0_10px_30px_rgba(217,119,6,0.3)] transition-all transform active:scale-95 text-xl header-font">
-                STAMP & EXECUTE PDF
+            <button @click="generatePDF" class="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-black py-6 rounded-2xl shadow-xl transition-all text-xl header-font">
+                STAMP & EXECUTE
             </button>
         </div>
     </div>
 
-    <div class="lg:col-span-8 bg-white paper-bond p-24 relative shadow-2xl text-zinc-900 min-h-[1200px] border-[24px] border-zinc-200">
-        
-        <div class="absolute inset-4 border-2 border-double border-zinc-300 pointer-events-none"></div>
-
-        <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none grayscale">
-            <img :src="activeLogo.url" class="w-[550px]">
+    <div class="lg:col-span-8 bg-white paper-bond p-20 relative text-slate-900 min-h-[1150px] border-[24px] border-slate-200 overflow-hidden">
+        <div class="flex flex-col items-center mb-12 border-b-2 border-slate-900 pb-8 text-center">
+            <img v-if="customLogo" :src="customLogo" class="w-32 h-32 mb-4 object-contain">
+            <span v-else class="text-6xl mb-4">⚖️</span>
+            <h3 class="header-font text-2xl uppercase tracking-widest font-black">Official Record of Authority</h3>
         </div>
 
-        <div class="flex flex-col items-center mb-16 z-10 relative">
-            <img :src="activeLogo.url" class="w-32 h-32 mb-6 object-contain">
-            <h3 class="header-font text-3xl uppercase tracking-[0.4em] font-black text-zinc-800">{{ activeLogo.authority }}</h3>
-            <div class="flex items-center gap-4 mt-4 w-full justify-center text-zinc-400">
-                <div class="h-px w-24 bg-zinc-300"></div>
-                <span class="text-[9px] font-black uppercase tracking-[0.5em]">Authentic Legal Record</span>
-                <div class="h-px w-24 bg-zinc-300"></div>
-            </div>
+        <div v-if="customLogo" class="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none grayscale">
+            <img :src="customLogo" class="w-[500px]">
         </div>
 
-        <div class="text-center mb-16 relative">
-            <h2 class="text-3xl font-bold uppercase tracking-tight header-font text-zinc-900 border-y border-zinc-200 py-6">
-                {{ selectedTemplate.name }}
-            </h2>
-        </div>
+        <h2 class="text-3xl text-center font-bold uppercase mb-12 tracking-tighter border-y-2 border-slate-100 py-4">{{ selectedTemplate.name }}</h2>
 
-        <div class="text-lg leading-[2.3] text-justify mb-24 whitespace-pre-line px-10 body-font legal-rules">
+        <div class="text-xl leading-[2.2] text-justify mb-24 px-10 whitespace-pre-line border-l-4 border-amber-800/20">
             {{ processedBody }}
         </div>
 
-        <div class="px-10 grid grid-cols-2 gap-20 relative">
-            <div class="z-10">
-                <div class="sig-font text-6xl text-blue-900 mb-[-10px] pl-4">
-                    {{ formData['Authorized_Signer_Name'] }}
-                </div>
-                <div class="border-t-2 border-zinc-900 w-full pt-2">
-                    <p class="font-black text-xs uppercase tracking-tighter">{{ formData['Authorized_Signer_Name'] || 'Authorized Signature' }}</p>
-                    <p class="text-[9px] text-zinc-500 uppercase font-black tracking-widest">Instrument Signatory</p>
-                </div>
-
-                <div class="absolute -top-16 left-48 w-48 h-48 rounded-full border-[8px] border-double border-red-800/30 flex flex-col items-center justify-center p-6 text-center -rotate-12 pointer-events-none select-none">
-                    <span class="header-font text-[9px] font-black text-red-800/50 leading-tight">
-                        SEAL OF THE AUTHORITY<br>ORIGINAL ARCHIVE<br>{{ refId }}
-                    </span>
+        <div class="px-10 grid grid-cols-2 gap-20 border-t-2 border-slate-900 pt-10 relative">
+            <div>
+                <div class="sig-font text-5xl py-2 h-16 text-blue-900">{{ formData['Primary_Signer'] }}</div>
+                <div class="border-t border-slate-900 w-full pt-2">
+                    <p class="font-black text-xs uppercase">{{ formData['Primary_Signer'] || 'Authorized Name' }}</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">First Party</p>
                 </div>
             </div>
-
-            <div class="border-t-2 border-zinc-900 pt-2 text-right flex flex-col justify-end">
-                <p class="text-sm font-bold">RECORD NUMBER: <span class="text-red-700">{{ refId }}</span></p>
-                <p class="text-sm font-bold mt-2">EXECUTED ON: {{ new Date().toLocaleDateString() }}</p>
-                <div class="h-10 mt-4 border-b border-zinc-300"></div>
-                <p class="text-[9px] text-zinc-400 font-black uppercase tracking-widest mt-1">Witness / Notary Signature</p>
+            <div>
+                <div class="sig-font text-5xl py-2 h-16 text-blue-900 italic opacity-80">{{ formData['Witness_Signer'] }}</div>
+                <div class="border-t border-slate-900 w-full pt-2">
+                    <p class="font-black text-xs uppercase">{{ formData['Witness_Signer'] || 'Attesting Witness' }}</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">Witness / Notary</p>
+                </div>
+            </div>
+            
+            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full border-[6px] border-double border-red-800/30 flex flex-col items-center justify-center text-center -rotate-12 pointer-events-none">
+                <span class="header-font text-[8px] font-black text-red-800/60 leading-tight">OFFICIALLY RECORDED<br>VALID INSTRUMENT<br>{{ refId }}</span>
             </div>
         </div>
     </div>
@@ -134,110 +100,68 @@ const { jsPDF } = window.jspdf;
 createApp({
     data() {
         return {
-            refId: 'LGL-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-            activeLogo: null,
-            formData: { Authorized_Signer_Name: '' },
-            logos: [
-                { id: 'fed', name: 'Federal', authority: 'Supreme Court of Jurisdiction', icon: '🏛️', url: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Great_Seal_of_the_United_States_%28obverse%29.svg' },
-                { id: 'bank', name: 'Financial', authority: 'Treasury & Monetary Authority', icon: '🏦', url: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/Seal_of_the_United_States_Department_of_the_Treasury.svg' },
-                { id: 'intl', name: 'Maritime', authority: 'Global Admiralty Registry', icon: '⚓', url: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Logo_of_the_United_Nations.svg' },
-                { id: 'corp', name: 'Registry', authority: 'Bureau of Corporate Records', icon: '📜', url: 'https://upload.wikimedia.org/wikipedia/commons/8/85/Seal_of_the_United_States_Department_of_Commerce.svg' }
-            ],
+            refId: 'LX-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+            customLogo: null,
+            selectedTemplate: null,
+            formData: { Primary_Signer: '', Witness_Signer: '' },
             templates: [
                 {
-                    name: "Irrevocable Durable Power of Attorney",
-                    fields: ["Principal_Full_Name", "Agent_Attorney_In_Fact", "Jurisdiction_State", "Powers_Granted", "Authorized_Signer_Name"],
-                    body: `BE IT KNOWN BY ALL MEN, that I, {{Principal_Full_Name}}, of lawful age, do hereby constitute and appoint {{Agent_Attorney_In_Fact}} as my true and lawful Attorney-in-Fact.\n\nI hereby grant my Agent full power and authority to act in my name and stead in {{Jurisdiction_State}} regarding: {{Powers_Granted}}. This Power of Attorney shall be DURABLE and shall not be affected by my subsequent disability or incapacity.\n\nI hereby ratify and confirm all that my said Agent shall lawfully do or cause to be done by virtue of this power and the rights and powers herein granted. All persons or entities shall be fully protected in relying upon this instrument as valid.`
+                    name: "Declaration of Sovereign Status",
+                    fields: ["Declarant_Full_Name", "Date_of_Birth", "Domicile_Address", "Primary_Signer", "Witness_Signer"],
+                    body: `I, {{Declarant_Full_Name}}, a living soul born on {{Date_of_Birth}}, do hereby declare my absolute standing as a sovereign individual.\n\nI establish my domicile at {{Domicile_Address}} and hereby revoke and rescind any and all prior signatures, powers of attorney, or registrations that were entered into through non-disclosure or duress. I claim all inherent rights and declare that this instrument serves as a public record of my lawful status and autonomy.`
                 },
                 {
-                    name: "Commercial General Release",
-                    fields: ["Releasor_Party", "Releasee_Party", "Claim_Description", "Settlement_Sum", "Authorized_Signer_Name"],
-                    body: `For and in consideration of the sum of {{Settlement_Sum}}, the receipt and sufficiency of which is hereby acknowledged, {{Releasor_Party}} (the "Releasor") does hereby remise, release, and forever discharge {{Releasee_Party}} (the "Releasee") from any and all claims, demands, damages, actions, or causes of action which the Releasor has or may have regarding: \n\n"{{Claim_Description}}"\n\nThis release shall be binding upon the Releasor's heirs, executors, administrators, and assigns. The Releasor warrants that no other party has any interest in the claims released herein and that the Releasor has the full right to execute this discharge.`
-                },
-                {
-                    name: "Affidavit of Citizenship & Status",
-                    fields: ["Affiant_Name", "Birth_Coordinates", "Legal_Status", "Declared_Residence", "Authorized_Signer_Name"],
-                    body: `I, {{Affiant_Name}}, being first duly sworn according to law, do hereby depose and state: \n\n1. That I am a natural-born individual born at {{Birth_Coordinates}}.\n2. That my legal status is defined as {{Legal_Status}}.\n3. That I maintain my principal residence at {{Declared_Residence}}.\n\nThis Affidavit is made under penalty of perjury for the purpose of establishing standing in all administrative and judicial proceedings. I declare that the facts stated herein are true and correct to the best of my knowledge and belief.`
+                    name: "Commercial Lien & Claim",
+                    fields: ["Lien_Debtor", "Claimant_Name", "Lien_Amount", "Basis_of_Claim", "Primary_Signer", "Witness_Signer"],
+                    body: `NOTICE TO THE PRINCIPAL IS NOTICE TO THE AGENT. A commercial lien is hereby placed against {{Lien_Debtor}} by the Claimant, {{Claimant_Name}}, for the amount of {{Lien_Amount}}.\n\nThis claim arises from the following breach: {{Basis_of_Claim}}. This document serves as a verified affidavit of truth. Failure to rebut this claim point-for-point within 30 days shall constitute an admission of fault and a final judgment in commerce.`
                 }
             ]
         }
     },
-    created() {
-        this.activeLogo = this.logos[0];
-        this.selectedTemplate = this.templates[0];
-    },
+    created() { this.selectedTemplate = this.templates[0]; },
     computed: {
         processedBody() {
             let text = this.selectedTemplate.body;
             this.selectedTemplate.fields.forEach(f => {
-                const val = this.formData[f] ? this.formData[f] : `[ ${f.replace(/_/g, ' ')} ]`;
-                text = text.replace(new RegExp(`{{${f}}}`, 'g'), val);
+                text = text.replace(new RegExp(`{{${f}}}`, 'g'), this.formData[f] || `[ ${f.replace(/_/g, ' ')} ]`);
             });
             return text;
         }
     },
     methods: {
-        async generatePDF() {
-            const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+        handleLogoUpload(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (f) => { this.customLogo = f.target.result; };
+            reader.readAsDataURL(file);
+        },
+        generatePDF() {
+            const doc = new jsPDF();
+            doc.setFillColor(253, 253, 251); doc.rect(0, 0, 210, 297, 'F');
             
-            const getBase64 = (url) => new Promise(res => {
-                const img = new Image(); img.crossOrigin = 'Anonymous';
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width; canvas.height = img.height;
-                    canvas.getContext('2d').drawImage(img, 0, 0);
-                    res(canvas.toDataURL('image/png'));
-                };
-                img.src = url;
-            });
+            if (this.customLogo) {
+                // Add Watermark
+                doc.setGState(new doc.GState({opacity: 0.05}));
+                doc.addImage(this.customLogo, 'PNG', 40, 80, 130, 130);
+                doc.setGState(new doc.GState({opacity: 1}));
+                // Add Header Logo
+                doc.addImage(this.customLogo, 'PNG', 90, 15, 30, 30);
+            }
 
-            const logoBase64 = await getBase64(this.activeLogo.url);
-
-            // 1. PAGE BACKGROUND (Authentic Bond Paper look)
-            doc.setFillColor(253, 253, 251);
-            doc.rect(0, 0, 210, 297, 'F');
-
-            // 2. SECURITY MARGINS (The Red Side Rule)
-            doc.setDrawColor(153, 27, 27); doc.setLineWidth(0.5);
-            doc.line(20, 10, 20, 287); // Left margin line
-
-            // 3. FAINT WATERMARK
-            doc.setGState(new doc.GState({opacity: 0.04}));
-            doc.addImage(logoBase64, 'PNG', 40, 80, 130, 130);
-            doc.setGState(new doc.GState({opacity: 1}));
-
-            // 4. HEADER
-            doc.addImage(logoBase64, 'PNG', 90, 15, 30, 30);
-            doc.setFont("times", "bold"); doc.setFontSize(11); doc.setTextColor(40, 40, 40);
-            doc.text(this.activeLogo.authority.toUpperCase(), 105, 52, { align: "center" });
-
-            // 5. TITLE WITH BORDER
-            doc.setFontSize(18); doc.setTextColor(0);
-            doc.text(this.selectedTemplate.name.toUpperCase(), 105, 68, { align: "center" });
-            doc.line(30, 72, 180, 72);
-
-            // 6. BODY TEXT
+            doc.setDrawColor(180, 0, 0); doc.setLineWidth(0.5); doc.line(20, 10, 20, 287);
+            doc.setFont("times", "bold"); doc.setFontSize(22); doc.text(this.selectedTemplate.name.toUpperCase(), 105, 60, { align: "center" });
+            
             doc.setFont("times", "normal"); doc.setFontSize(12);
-            const lines = doc.splitTextToSize(this.processedBody, 155);
-            doc.text(lines, 30, 85, { align: 'justify', lineHeightFactor: 1.8 });
+            const splitText = doc.splitTextToSize(this.processedBody, 160);
+            doc.text(splitText, 25, 80, { align: 'justify', lineHeightFactor: 1.8 });
 
-            // 7. NOTARY SEAL (RED INK)
-            doc.setDrawColor(150, 0, 0); doc.setLineWidth(1);
-            doc.circle(165, 240, 22);
-            doc.setFontSize(7); doc.setTextColor(150, 0, 0);
-            doc.text("OFFICIAL SEAL", 165, 237, {align: "center"});
-            doc.text(this.refId, 165, 241, {align: "center"});
-            doc.text("VALID INSTRUMENT", 165, 245, {align: "center"});
-
-            // 8. SIGNATURE SECTION
-            doc.setTextColor(0, 0, 128); doc.setFont("times", "italic"); doc.setFontSize(28);
-            doc.text(this.formData.Authorized_Signer_Name || "", 30, 240);
-            doc.setDrawColor(0); doc.line(30, 242, 100, 242);
-            doc.setTextColor(0); doc.setFont("times", "bold"); doc.setFontSize(9);
-            doc.text("AUTHORIZED SIGNATORY", 30, 247);
-            doc.text("DATED: " + new Date().toLocaleDateString(), 135, 268);
-            doc.text("REF: " + this.refId, 135, 273);
-
+            const y = 240;
+            doc.setTextColor(0, 0, 128); doc.setFont("times", "italic"); doc.setFontSize(24);
+            doc.text(this.formData.Primary_Signer || "", 25, y);
+            doc.text(this.formData.Witness_Signer || "", 115, y);
+            
+            doc.setDrawColor(0); doc.line(25, y+2, 90, y+2); doc.line(115, y+2, 185, y+2);
+            doc.setTextColor(150, 0, 0); doc.circle(105, 250, 18);
             doc.save(`${this.selectedTemplate.name}.pdf`);
         }
     }
