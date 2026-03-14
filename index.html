@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sovereign Legal Instrument Generator</title>
+    <title>Sovereign Legal Instrument - Ultra Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Cinzel:wght@700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Cinzel:wght@800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         .sig-font { font-family: 'Dancing Script', cursive; }
         .header-font { font-family: 'Cinzel', serif; }
@@ -15,99 +15,113 @@
         .paper-bond {
             background-color: #fdfdfb;
             background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.05);
+            box-shadow: 0 0 50px rgba(0,0,0,0.3);
         }
-        .security-border {
-            border: 20px solid transparent;
-            border-image: url('https://www.transparenttextures.com/patterns/pinstriped-suit.png') 30 round;
+        .legal-rules {
+            border-left: 2px solid #991b1b;
+            border-right: 1px solid #e2e8f0;
         }
+        /* Scoped Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-stone-900 min-h-screen p-4 body-font text-stone-200">
+<body class="bg-[#1a1a1a] min-h-screen p-4 body-font text-zinc-300">
 
-<div id="app" class="max-w-[1700px] mx-auto grid lg:grid-cols-12 gap-8">
+<div id="app" class="max-w-[1800px] mx-auto grid lg:grid-cols-12 gap-8">
     
-    <div class="lg:col-span-4 bg-stone-800 p-8 rounded-2xl shadow-2xl border border-stone-700 h-[90vh] overflow-y-auto custom-scrollbar">
-        <div class="mb-8 text-center">
-            <h1 class="header-font text-2xl tracking-widest text-amber-500">LEX SOVEREIGN</h1>
-            <p class="text-[9px] uppercase tracking-[0.4em] text-stone-500">Secure Client-Side Document Generation</p>
+    <div class="lg:col-span-4 bg-[#262626] p-8 rounded-3xl shadow-2xl h-[92vh] overflow-y-auto custom-scrollbar border border-zinc-800">
+        <div class="mb-10">
+            <h1 class="header-font text-3xl tracking-widest text-amber-500 font-black">LEX SUPREME</h1>
+            <div class="h-1 w-20 bg-amber-600 mt-2"></div>
+            <p class="text-[10px] uppercase tracking-[0.5em] text-zinc-500 mt-2 font-bold">Encrypted Client-Side Execution</p>
         </div>
 
-        <div class="space-y-6">
-            <div>
-                <label class="block text-xs font-black uppercase text-amber-500/70 mb-2">1. Select Legal Instrument</label>
-                <select v-model="selectedTemplate" class="w-full p-4 bg-stone-900 border border-stone-600 rounded-xl text-sm outline-none focus:border-amber-500 transition">
+        <div class="space-y-8">
+            <section>
+                <label class="block text-xs font-black uppercase text-amber-500 mb-3 tracking-widest">Instrument Selection</label>
+                <select v-model="selectedTemplate" class="w-full p-4 bg-zinc-900 border border-zinc-700 rounded-xl text-zinc-100 outline-none focus:ring-2 focus:ring-amber-500 transition font-bold">
                     <option v-for="t in templates" :value="t">{{ t.name }}</option>
                 </select>
-            </div>
+            </section>
 
-            <div>
-                <label class="block text-xs font-black uppercase text-amber-500/70 mb-2">2. Issuing Authority</label>
+            <section>
+                <label class="block text-xs font-black uppercase text-amber-500 mb-3 tracking-widest">Authority Jurisdiction</label>
                 <div class="grid grid-cols-2 gap-3">
                     <button v-for="l in logos" @click="activeLogo = l" 
-                        :class="activeLogo.id === l.id ? 'border-amber-500 bg-amber-500/10 text-amber-500' : 'border-stone-600 text-stone-400'"
-                        class="p-3 text-[10px] font-bold rounded-lg border-2 uppercase transition hover:bg-stone-700">
+                        :class="activeLogo.id === l.id ? 'border-amber-500 bg-amber-500 text-zinc-900 shadow-lg' : 'border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-500'"
+                        class="p-4 text-[10px] font-black rounded-xl border-2 uppercase transition-all flex flex-col items-center gap-2">
+                        <span class="text-xl">{{ l.icon }}</span>
                         {{ l.name }}
                     </button>
                 </div>
-            </div>
+            </section>
 
-            <div class="space-y-4 pt-4 border-t border-stone-700">
-                <label class="block text-xs font-black uppercase text-amber-500/70">3. Execute Variables</label>
+            <section class="space-y-4 pt-6 border-t border-zinc-800">
+                <label class="block text-xs font-black uppercase text-amber-500 tracking-widest">Document Particulars</label>
                 <div v-for="field in selectedTemplate.fields" :key="field">
-                    <label class="block text-[10px] font-bold text-stone-400 uppercase mb-1">{{ field.replace(/_/g, ' ') }}</label>
+                    <label class="block text-[9px] font-black text-zinc-500 uppercase mb-1 tracking-wider">{{ field.replace(/_/g, ' ') }}</label>
                     <input type="text" v-model="formData[field]" 
-                        class="w-full p-3 bg-stone-900 border border-stone-700 rounded-lg text-sm focus:border-amber-500 outline-none transition">
+                        class="w-full p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-200 focus:border-amber-500 outline-none transition shadow-inner">
                 </div>
-            </div>
+            </section>
 
-            <button @click="generatePDF" class="w-full bg-amber-600 hover:bg-amber-500 text-stone-900 font-black py-5 rounded-xl shadow-2xl transition transform active:scale-95 text-lg">
-                EXECUTE DOCUMENT
+            <button @click="generatePDF" class="w-full bg-amber-600 hover:bg-amber-500 text-zinc-950 font-black py-6 rounded-2xl shadow-[0_10px_30px_rgba(217,119,6,0.3)] transition-all transform active:scale-95 text-xl header-font">
+                STAMP & EXECUTE PDF
             </button>
         </div>
     </div>
 
-    <div class="lg:col-span-8 bg-white paper-bond p-20 relative shadow-[0_0_80px_rgba(0,0,0,0.8)] text-stone-900 overflow-hidden min-h-[1100px]">
+    <div class="lg:col-span-8 bg-white paper-bond p-24 relative shadow-2xl text-zinc-900 min-h-[1200px] border-[24px] border-zinc-200">
         
+        <div class="absolute inset-4 border-2 border-double border-zinc-300 pointer-events-none"></div>
+
         <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none grayscale">
-            <img :src="activeLogo.url" class="w-[600px]">
+            <img :src="activeLogo.url" class="w-[550px]">
         </div>
 
-        <div class="flex flex-col items-center mb-16 border-b-4 border-stone-900 pb-8">
-            <img :src="activeLogo.url" class="w-28 h-28 mb-6 object-contain">
-            <h3 class="header-font text-2xl uppercase tracking-[0.3em]">{{ activeLogo.authority }}</h3>
-            <p class="text-xs font-bold tracking-[0.5em] mt-2 uppercase text-stone-500">Certified Official Record</p>
+        <div class="flex flex-col items-center mb-16 z-10 relative">
+            <img :src="activeLogo.url" class="w-32 h-32 mb-6 object-contain">
+            <h3 class="header-font text-3xl uppercase tracking-[0.4em] font-black text-zinc-800">{{ activeLogo.authority }}</h3>
+            <div class="flex items-center gap-4 mt-4 w-full justify-center text-zinc-400">
+                <div class="h-px w-24 bg-zinc-300"></div>
+                <span class="text-[9px] font-black uppercase tracking-[0.5em]">Authentic Legal Record</span>
+                <div class="h-px w-24 bg-zinc-300"></div>
+            </div>
         </div>
 
-        <h2 class="text-3xl text-center font-bold uppercase mb-12 tracking-tighter border-y-2 border-stone-200 py-4">
-            {{ selectedTemplate.name }}
-        </h2>
+        <div class="text-center mb-16 relative">
+            <h2 class="text-3xl font-bold uppercase tracking-tight header-font text-zinc-900 border-y border-zinc-200 py-6">
+                {{ selectedTemplate.name }}
+            </h2>
+        </div>
 
-        <div class="text-lg leading-[2.1] text-justify mb-24 whitespace-pre-line indent-12">
+        <div class="text-lg leading-[2.3] text-justify mb-24 whitespace-pre-line px-10 body-font legal-rules">
             {{ processedBody }}
         </div>
 
-        <div class="grid grid-cols-2 gap-16 mt-auto">
-            <div class="relative">
-                <div class="sig-font text-6xl text-blue-800 mb-[-15px] pl-4">
+        <div class="px-10 grid grid-cols-2 gap-20 relative">
+            <div class="z-10">
+                <div class="sig-font text-6xl text-blue-900 mb-[-10px] pl-4">
                     {{ formData['Authorized_Signer_Name'] }}
                 </div>
-                <div class="border-t-2 border-stone-900 pt-2">
-                    <p class="font-bold text-sm uppercase">{{ formData['Authorized_Signer_Name'] || 'Authorized Signature' }}</p>
-                    <p class="text-[10px] text-stone-500 uppercase font-bold tracking-widest">Signatory Representative</p>
+                <div class="border-t-2 border-zinc-900 w-full pt-2">
+                    <p class="font-black text-xs uppercase tracking-tighter">{{ formData['Authorized_Signer_Name'] || 'Authorized Signature' }}</p>
+                    <p class="text-[9px] text-zinc-500 uppercase font-black tracking-widest">Instrument Signatory</p>
                 </div>
 
-                <div class="absolute -top-12 left-32 w-44 h-44 rounded-full border-[6px] border-double border-red-800/40 flex flex-col items-center justify-center p-4 text-center -rotate-12 pointer-events-none">
-                    <span class="header-font text-[9px] font-black text-red-800/60 leading-tight">
-                        VALIDATED INSTRUMENT<br>OFFICIAL ARCHIVE<br>{{ refId }}
+                <div class="absolute -top-16 left-48 w-48 h-48 rounded-full border-[8px] border-double border-red-800/30 flex flex-col items-center justify-center p-6 text-center -rotate-12 pointer-events-none select-none">
+                    <span class="header-font text-[9px] font-black text-red-800/50 leading-tight">
+                        SEAL OF THE AUTHORITY<br>ORIGINAL ARCHIVE<br>{{ refId }}
                     </span>
                 </div>
             </div>
 
-            <div class="flex flex-col justify-end text-right border-t-2 border-stone-900 pt-2">
-                <p class="text-sm font-bold">Document Ref: <span class="text-red-700">{{ refId }}</span></p>
-                <p class="text-sm italic">Executed on {{ new Date().toLocaleDateString() }}</p>
-                <p class="text-[10px] text-stone-400 mt-2 font-bold uppercase">Archive Copy 01-A</p>
+            <div class="border-t-2 border-zinc-900 pt-2 text-right flex flex-col justify-end">
+                <p class="text-sm font-bold">RECORD NUMBER: <span class="text-red-700">{{ refId }}</span></p>
+                <p class="text-sm font-bold mt-2">EXECUTED ON: {{ new Date().toLocaleDateString() }}</p>
+                <div class="h-10 mt-4 border-b border-zinc-300"></div>
+                <p class="text-[9px] text-zinc-400 font-black uppercase tracking-widest mt-1">Witness / Notary Signature</p>
             </div>
         </div>
     </div>
@@ -120,35 +134,30 @@ const { jsPDF } = window.jspdf;
 createApp({
     data() {
         return {
-            refId: 'LX-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+            refId: 'LGL-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
             activeLogo: null,
             formData: { Authorized_Signer_Name: '' },
             logos: [
-                { id: 'intl', name: 'Global Court', authority: 'International Court of Justice', url: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Logo_of_the_United_Nations.svg' },
-                { id: 'fed', name: 'Supreme Registry', authority: 'Federal Bureau of Records', url: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Great_Seal_of_the_United_States_%28obverse%29.svg' },
-                { id: 'bank', name: 'Treasury Dept', authority: 'Central Bank & Reserve', url: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/Seal_of_the_United_States_Department_of_the_Treasury.svg' },
-                { id: 'land', name: 'Land Records', authority: 'National Title Commission', url: 'https://upload.wikimedia.org/wikipedia/commons/d/df/Seal_of_the_United_States_Department_of_the_Interior.svg' }
+                { id: 'fed', name: 'Federal', authority: 'Supreme Court of Jurisdiction', icon: '🏛️', url: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Great_Seal_of_the_United_States_%28obverse%29.svg' },
+                { id: 'bank', name: 'Financial', authority: 'Treasury & Monetary Authority', icon: '🏦', url: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/Seal_of_the_United_States_Department_of_the_Treasury.svg' },
+                { id: 'intl', name: 'Maritime', authority: 'Global Admiralty Registry', icon: '⚓', url: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Logo_of_the_United_Nations.svg' },
+                { id: 'corp', name: 'Registry', authority: 'Bureau of Corporate Records', icon: '📜', url: 'https://upload.wikimedia.org/wikipedia/commons/8/85/Seal_of_the_United_States_Department_of_Commerce.svg' }
             ],
             templates: [
                 {
-                    name: "Absolute Deed of Sale (Property)",
-                    fields: ["Vendor_Name", "Vendee_Name", "Property_TCT_Number", "Technical_Description", "Sale_Price_Words", "Sale_Price_Numeric", "Authorized_Signer_Name"],
-                    body: `This DEED OF ABSOLUTE SALE is made and executed by {{Vendor_Name}}, hereinafter referred to as the VENDOR, in favor of {{Vendee_Name}}, hereinafter referred to as the VENDEE.\n\nWHEREAS, the VENDOR is the absolute registered owner of a parcel of land covered by Transfer Certificate of Title No. {{Property_TCT_Number}}, more particularly described as follows:\n\n"{{Technical_Description}}"\n\nNOW THEREFORE, for and in consideration of the sum of {{Sale_Price_Words}} ({{Sale_Price_Numeric}}), the VENDOR hereby SELLS, TRANSFERS, and CONVEYS, by way of Absolute Sale, unto the said VENDEE, the above-described property, free from all liens and encumbrances. The VENDOR warrants valid title and peaceful possession of the property herein conveyed.`
+                    name: "Irrevocable Durable Power of Attorney",
+                    fields: ["Principal_Full_Name", "Agent_Attorney_In_Fact", "Jurisdiction_State", "Powers_Granted", "Authorized_Signer_Name"],
+                    body: `BE IT KNOWN BY ALL MEN, that I, {{Principal_Full_Name}}, of lawful age, do hereby constitute and appoint {{Agent_Attorney_In_Fact}} as my true and lawful Attorney-in-Fact.\n\nI hereby grant my Agent full power and authority to act in my name and stead in {{Jurisdiction_State}} regarding: {{Powers_Granted}}. This Power of Attorney shall be DURABLE and shall not be affected by my subsequent disability or incapacity.\n\nI hereby ratify and confirm all that my said Agent shall lawfully do or cause to be done by virtue of this power and the rights and powers herein granted. All persons or entities shall be fully protected in relying upon this instrument as valid.`
                 },
                 {
-                    name: "Irrevocable Living Trust",
-                    fields: ["Grantor_Name", "Trustee_Name", "Trust_Name", "Successor_Trustee", "Jurisdiction", "Authorized_Signer_Name"],
-                    body: `I, {{Grantor_Name}}, as Grantor, do hereby establish the {{Trust_Name}} for the benefit of the beneficiaries named herein. I appoint {{Trustee_Name}} to serve as the initial Trustee of this Trust. In the event of death or incapacity, {{Successor_Trustee}} shall assume all fiduciary duties.\n\nThis Trust shall be governed by the laws of {{Jurisdiction}}. The Trustee shall hold, manage, and invest the Trust property and shall distribute the income and principal for the support and education of the beneficiaries according to the provisions of this instrument. This Trust is declared to be irrevocable and cannot be amended or revoked by the Grantor.`
+                    name: "Commercial General Release",
+                    fields: ["Releasor_Party", "Releasee_Party", "Claim_Description", "Settlement_Sum", "Authorized_Signer_Name"],
+                    body: `For and in consideration of the sum of {{Settlement_Sum}}, the receipt and sufficiency of which is hereby acknowledged, {{Releasor_Party}} (the "Releasor") does hereby remise, release, and forever discharge {{Releasee_Party}} (the "Releasee") from any and all claims, demands, damages, actions, or causes of action which the Releasor has or may have regarding: \n\n"{{Claim_Description}}"\n\nThis release shall be binding upon the Releasor's heirs, executors, administrators, and assigns. The Releasor warrants that no other party has any interest in the claims released herein and that the Releasor has the full right to execute this discharge.`
                 },
                 {
-                    name: "Corporate Stock Assignment",
-                    fields: ["Assignor_Name", "Assignee_Name", "Company_Entity", "Certificate_No", "Number_of_Shares", "Authorized_Signer_Name"],
-                    body: `FOR VALUE RECEIVED, {{Assignor_Name}} hereby sells, assigns, and transfers unto {{Assignee_Name}}, {{Number_of_Shares}} shares of the Common Stock of {{Company_Entity}} represented by Certificate No. {{Certificate_No}}.\n\nThe Assignor does hereby irrevocably constitute and appoint the Secretary of said Corporation to transfer the said stock on the books of the within named Corporation with full power of substitution in the premises. The Assignor warrants that they have full legal authority to transfer said shares and that said shares are free of any pledges or security interests.`
-                },
-                {
-                    name: "Decree of Final Judgment",
-                    fields: ["Case_Title", "Docket_Number", "Presiding_Judge", "Judgment_Details", "Authorized_Signer_Name"],
-                    body: `IN THE SUPREME COURT OF RECORDS. Regarding Case No. {{Docket_Number}}, titled {{Case_Title}}. This matter came before the Court presided over by Honorable {{Presiding_Judge}}.\n\nIT IS HEREBY ADJUDGED AND DECREED that judgment is entered in favor of the Petitioner. The Respondent is hereby commanded to: {{Judgment_Details}}. This Decree is final, and no further appeals shall be entertained unless new evidence is produced under the statutes of limitations.`
+                    name: "Affidavit of Citizenship & Status",
+                    fields: ["Affiant_Name", "Birth_Coordinates", "Legal_Status", "Declared_Residence", "Authorized_Signer_Name"],
+                    body: `I, {{Affiant_Name}}, being first duly sworn according to law, do hereby depose and state: \n\n1. That I am a natural-born individual born at {{Birth_Coordinates}}.\n2. That my legal status is defined as {{Legal_Status}}.\n3. That I maintain my principal residence at {{Declared_Residence}}.\n\nThis Affidavit is made under penalty of perjury for the purpose of establishing standing in all administrative and judicial proceedings. I declare that the facts stated herein are true and correct to the best of my knowledge and belief.`
                 }
             ]
         }
@@ -184,43 +193,51 @@ createApp({
 
             const logoBase64 = await getBase64(this.activeLogo.url);
 
-            // Watermark (5% opacity)
-            doc.setGState(new doc.GState({opacity: 0.05}));
-            doc.addImage(logoBase64, 'PNG', 35, 80, 140, 140);
+            // 1. PAGE BACKGROUND (Authentic Bond Paper look)
+            doc.setFillColor(253, 253, 251);
+            doc.rect(0, 0, 210, 297, 'F');
+
+            // 2. SECURITY MARGINS (The Red Side Rule)
+            doc.setDrawColor(153, 27, 27); doc.setLineWidth(0.5);
+            doc.line(20, 10, 20, 287); // Left margin line
+
+            // 3. FAINT WATERMARK
+            doc.setGState(new doc.GState({opacity: 0.04}));
+            doc.addImage(logoBase64, 'PNG', 40, 80, 130, 130);
             doc.setGState(new doc.GState({opacity: 1}));
 
-            // Header Logo
+            // 4. HEADER
             doc.addImage(logoBase64, 'PNG', 90, 15, 30, 30);
-            doc.setFont("times", "bold");
-            doc.setFontSize(10);
+            doc.setFont("times", "bold"); doc.setFontSize(11); doc.setTextColor(40, 40, 40);
             doc.text(this.activeLogo.authority.toUpperCase(), 105, 52, { align: "center" });
 
-            // Title
-            doc.setFontSize(18);
-            doc.text(this.selectedTemplate.name.toUpperCase(), 105, 70, { align: "center" });
-            doc.line(40, 72, 170, 72);
+            // 5. TITLE WITH BORDER
+            doc.setFontSize(18); doc.setTextColor(0);
+            doc.text(this.selectedTemplate.name.toUpperCase(), 105, 68, { align: "center" });
+            doc.line(30, 72, 180, 72);
 
-            // Body
-            doc.setFont("times", "normal");
-            doc.setFontSize(12);
-            const bodyLines = doc.splitTextToSize(this.processedBody, 160);
-            doc.text(bodyLines, 25, 90, { align: 'justify', lineHeightFactor: 1.6 });
+            // 6. BODY TEXT
+            doc.setFont("times", "normal"); doc.setFontSize(12);
+            const lines = doc.splitTextToSize(this.processedBody, 155);
+            doc.text(lines, 30, 85, { align: 'justify', lineHeightFactor: 1.8 });
 
-            // Red Seal Circle
-            doc.setDrawColor(150, 0, 0); doc.setLineWidth(0.8);
-            doc.circle(160, 245, 18);
-            doc.setFontSize(6); doc.setTextColor(150, 0, 0);
-            doc.text("OFFICIAL SEAL", 160, 243, {align: "center"});
-            doc.text(this.refId, 160, 247, {align: "center"});
+            // 7. NOTARY SEAL (RED INK)
+            doc.setDrawColor(150, 0, 0); doc.setLineWidth(1);
+            doc.circle(165, 240, 22);
+            doc.setFontSize(7); doc.setTextColor(150, 0, 0);
+            doc.text("OFFICIAL SEAL", 165, 237, {align: "center"});
+            doc.text(this.refId, 165, 241, {align: "center"});
+            doc.text("VALID INSTRUMENT", 165, 245, {align: "center"});
 
-            // Signature
-            doc.setTextColor(0, 0, 128); doc.setFont("times", "italic"); doc.setFontSize(26);
-            doc.text(this.formData.Authorized_Signer_Name || "", 30, 245);
-            doc.line(30, 247, 100, 247);
+            // 8. SIGNATURE SECTION
+            doc.setTextColor(0, 0, 128); doc.setFont("times", "italic"); doc.setFontSize(28);
+            doc.text(this.formData.Authorized_Signer_Name || "", 30, 240);
+            doc.setDrawColor(0); doc.line(30, 242, 100, 242);
             doc.setTextColor(0); doc.setFont("times", "bold"); doc.setFontSize(9);
-            doc.text("AUTHORIZED SIGNATORY", 30, 252);
+            doc.text("AUTHORIZED SIGNATORY", 30, 247);
+            doc.text("DATED: " + new Date().toLocaleDateString(), 135, 268);
+            doc.text("REF: " + this.refId, 135, 273);
 
-            doc.text("REF: " + this.refId, 140, 275);
             doc.save(`${this.selectedTemplate.name}.pdf`);
         }
     }
