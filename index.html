@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lex Supreme - Final Production</title>
+    <title>Lex Supreme - Final Ownership Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -12,29 +12,29 @@
         .sig-font { font-family: 'Dancing Script', cursive; }
         .header-font { font-family: 'Cinzel', serif; }
         .body-font { font-family: 'Libre Baskerville', serif; }
-        body { background-color: #0a0a0a; color: #e2e8f0; }
-        .preview-paper { background: white; color: black; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        body { background-color: #050505; color: #d4d4d8; }
+        .paper-preview { background: white; color: black; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-6">
 
-<div id="app" class="max-w-[1600px] mx-auto grid lg:grid-cols-12 gap-10">
+<div id="app" class="max-w-[1800px] mx-auto grid lg:grid-cols-12 gap-8">
     
-    <div class="lg:col-span-4 bg-zinc-900 p-8 rounded-3xl border border-zinc-800 h-[92vh] overflow-y-auto custom-scrollbar">
-        <h1 class="header-font text-2xl text-amber-500 mb-2 font-black tracking-widest">LEX SUPREME</h1>
-        <p class="text-[9px] uppercase tracking-[0.4em] text-zinc-500 mb-8 font-bold">Precision Instrument Engine v6.0</p>
+    <div class="lg:col-span-4 bg-[#111] p-8 rounded-2xl border border-zinc-800 h-[94vh] overflow-y-auto">
+        <h1 class="header-font text-2xl text-amber-500 mb-2 font-black tracking-tighter">LEX SUPREME</h1>
+        <p class="text-[10px] uppercase tracking-[0.4em] text-zinc-500 mb-8 font-bold border-b border-zinc-800 pb-4">Ownership & Title System v7.0</p>
         
-        <div class="space-y-6">
-            <section class="p-6 bg-zinc-950 border-2 border-dashed border-zinc-800 rounded-2xl text-center hover:border-amber-600 transition-all">
+        <div class="space-y-5">
+            <section class="p-4 bg-zinc-950 border border-zinc-800 rounded-xl text-center">
                 <input type="file" @change="handleLogoUpload" class="hidden" id="logoUpload">
                 <label for="logoUpload" class="cursor-pointer text-zinc-400 text-[10px] font-bold uppercase tracking-widest">
-                    {{ customLogo ? 'Seal Loaded ✓' : 'Upload Authority Crest' }}
+                    {{ customLogo ? 'Seal Active' : 'Upload Authority Seal' }}
                 </label>
             </section>
 
             <div>
-                <label class="block text-[10px] font-black uppercase text-amber-500 mb-2">Instrument Select</label>
-                <select v-model="selectedTemplate" class="w-full p-4 bg-black border border-zinc-800 rounded-xl text-white font-bold outline-none focus:ring-1 focus:ring-amber-500">
+                <label class="block text-[10px] font-black uppercase text-amber-500 mb-2">Select Instrument</label>
+                <select v-model="selectedTemplate" class="w-full p-4 bg-black border border-zinc-800 rounded-xl text-white font-bold outline-none">
                     <option v-for="t in templates" :value="t">{{ t.name }}</option>
                 </select>
             </div>
@@ -46,38 +46,39 @@
                 </div>
             </div>
 
-            <button @click="generatePDF" class="w-full bg-amber-600 hover:bg-amber-500 text-black font-black py-6 rounded-2xl shadow-2xl transition-all transform active:scale-95 text-lg header-font">
-                EXECUTE FINAL RECORD
+            <button @click="generatePDF" class="w-full bg-amber-600 hover:bg-amber-500 text-black font-black py-5 rounded-xl shadow-2xl transition-all text-lg header-font">
+                DOWNLOAD OFFICIAL RECORD
             </button>
         </div>
     </div>
 
-    <div class="lg:col-span-8 preview-paper p-16 relative min-h-[1100px] overflow-hidden">
-        <div class="absolute left-10 top-10 bottom-10 w-[1.5px] bg-red-700 opacity-60"></div>
+    <div class="lg:col-span-8 paper-preview p-20 relative min-h-[1100px] overflow-hidden">
+        <div class="absolute left-12 top-10 bottom-10 w-[2px] bg-red-700 opacity-40"></div>
         
         <div class="relative z-10 px-10">
             <div class="text-center mb-10">
-                <img v-if="customLogo" :src="customLogo" class="w-32 h-32 mx-auto mb-6 object-contain">
-                <h3 class="header-font text-3xl font-black uppercase tracking-tighter border-b-4 border-black inline-block px-4">Instrument of Record</h3>
+                <img v-if="customLogo" :src="customLogo" class="w-32 h-32 mx-auto mb-4 object-contain">
+                <h3 class="header-font text-3xl font-black uppercase tracking-tighter">Instrument of Record</h3>
+                <div class="h-1 w-40 bg-black mx-auto mt-2"></div>
             </div>
 
-            <h2 class="text-2xl text-center font-bold uppercase mb-8 py-2 tracking-widest bg-zinc-50">{{ selectedTemplate.name }}</h2>
+            <h2 class="text-2xl text-center font-bold uppercase mb-8 py-2 tracking-widest bg-zinc-50 border-y border-zinc-200">{{ selectedTemplate.name }}</h2>
 
-            <div class="text-[19px] leading-[1.7] text-justify mb-20 whitespace-pre-line body-font">
+            <div class="text-[19px] leading-[1.8] text-justify mb-24 whitespace-pre-line body-font">
                 {{ processedBody }}
             </div>
 
-            <div class="grid grid-cols-2 gap-10 pt-16 border-t-2 border-zinc-100 relative mt-20">
+            <div class="grid grid-cols-2 gap-10 pt-16 border-t-2 border-zinc-200 relative mt-20">
                 <div class="text-center">
-                    <div class="sig-font text-5xl py-2 h-20 text-blue-900">{{ formData['Primary_Signer'] }}</div>
-                    <div class="border-t-2 border-black pt-1 font-bold uppercase text-xs">Primary Declarant</div>
+                    <div class="sig-font text-6xl py-2 h-20 text-blue-900">{{ formData['Primary_Signer'] }}</div>
+                    <div class="border-t-2 border-black pt-1 font-bold uppercase text-[10px]">Grantor / Seller Signature</div>
                 </div>
                 <div class="text-center">
-                    <div class="sig-font text-5xl py-2 h-20 text-blue-900">{{ formData['Witness_Signer'] }}</div>
-                    <div class="border-t-2 border-black pt-1 font-bold uppercase text-xs">Attesting Witness</div>
+                    <div class="sig-font text-6xl py-2 h-20 text-blue-900 opacity-80">{{ formData['Witness_Signer'] }}</div>
+                    <div class="border-t-2 border-black pt-1 font-bold uppercase text-[10px]">Witness / Notary Signature</div>
                 </div>
-                <div class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border-4 border-double border-red-800/30 flex items-center justify-center -rotate-12 bg-white/90">
-                    <span class="header-font text-[9px] font-black text-red-800/60 uppercase text-center">Certified<br>Original<br>Record</span>
+                <div class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 w-36 h-36 rounded-full border-4 border-double border-red-800/30 flex items-center justify-center -rotate-12 bg-white/90">
+                    <span class="header-font text-[9px] font-black text-red-800/60 uppercase text-center">Certified<br>Transfer of<br>Ownership</span>
                 </div>
             </div>
         </div>
@@ -96,19 +97,24 @@ createApp({
             formData: { Primary_Signer: '', Witness_Signer: '' },
             templates: [
                 {
-                    name: "Deed of Allodial Title",
-                    fields: ["Declarant_Name", "Property_Description", "Parcel_ID", "Jurisdiction", "Primary_Signer", "Witness_Signer"],
-                    body: `I, {{Declarant_Name}}, hereby declare an Absolute Allodial Title for the parcel described as: {{Property_Description}} (Reference ID: {{Parcel_ID}}).\n\nThis conveyance is made independent of any corporate or statutory superior. I claim absolute dominion over the soil, water, and minerals within this estate in the jurisdiction of {{Jurisdiction}}. No property tax, easement, or statutory encumbrance shall be recognized without express written consent from the Grantee. This is a final and supreme claim of ownership.`
+                    name: "Deed of Allodial Title & Land Receipt",
+                    fields: ["Purchaser_Name", "Seller_Name", "Payment_Amount", "Property_Description", "Jurisdiction", "Primary_Signer", "Witness_Signer"],
+                    body: `This DEED AND RECEIPT confirms that for the sum of {{Payment_Amount}}, the receipt of which is hereby acknowledged, {{Seller_Name}} (Seller) has transferred all rights and Allodial Title of the following property to {{Purchaser_Name}} (Grantee).\n\nPROPERTY DESCRIPTION: {{Property_Description}}.\n\nThis conveyance is an absolute transfer of ownership, free and clear of any corporate liens or superior claims. The Grantee now holds supreme dominion over the land, water, and minerals within said parcel in the jurisdiction of {{Jurisdiction}}. This document serves as the final proof of purchase and original title.`
+                },
+                {
+                    name: "Absolute Bill of Sale & Receipt",
+                    fields: ["Buyer_Name", "Seller_Name", "Item_Description", "Sale_Price", "Serial_Number", "Primary_Signer", "Witness_Signer"],
+                    body: `KNOW ALL MEN BY THESE PRESENTS, that {{Seller_Name}}, in consideration of the sum of {{Sale_Price}} paid by {{Buyer_Name}}, does hereby sell, transfer, and deliver the following: {{Item_Description}} (Ref: {{Serial_Number}}).\n\nThe Seller warrants that they are the lawful owner and have the absolute right to sell said property. This receipt constitutes a full and final discharge of the debt incurred for this purchase. All rights of possession and ownership are hereby vested in the Buyer.`
+                },
+                {
+                    name: "Irrevocable Private Trust Indenture",
+                    fields: ["Settlor_Name", "Trustee_Name", "Trust_Name", "Asset_Schedule", "Primary_Signer", "Witness_Signer"],
+                    body: `This INDENTURE OF TRUST is established by {{Settlor_Name}} (Settlor) and {{Trustee_Name}} (Trustee) for the management of the {{Trust_Name}}.\n\nThe Settlor hereby transfers the assets described as {{Asset_Schedule}} to the Trust. This Trust is irrevocable and the assets are held for the benefit of the beneficiaries as defined in the private ledger. The Trustee has full authority to manage and protect the trust property under the common law.`
                 },
                 {
                     name: "Commercial Lien & Claim",
                     fields: ["Debtor_Name", "Claimant_Name", "Lien_Amount", "Basis_of_Claim", "Primary_Signer", "Witness_Signer"],
-                    body: `NOTICE TO THE PRINCIPAL IS NOTICE TO THE AGENT. A commercial maritime lien is hereby established against {{Debtor_Name}} in favor of the Claimant, {{Claimant_Name}}, for the sum of {{Lien_Amount}}.\n\nThis claim arises from the following breach of contract: {{Basis_of_Claim}}. Failure to rebut this claim point-for-point by verified affidavit within 30 days shall constitute an admission of fault and a default judgment in commerce.`
-                },
-                {
-                    name: "Private Family Trust Indenture",
-                    fields: ["Settlor_Name", "Trustee_Name", "Trust_Name", "Asset_Schedule", "Primary_Signer", "Witness_Signer"],
-                    body: `This INDENTURE OF TRUST is established by {{Settlor_Name}} (Settlor) and {{Trustee_Name}} (Trustee) for the management of the {{Trust_Name}}.\n\nThe Settlor hereby transfers the assets described as {{Asset_Schedule}} to the Trust. This Trust is irrevocable and the assets are held for the benefit of the beneficiaries as defined in the private ledger. The Trustee has full authority to manage and protect the trust property under the common law.`
+                    body: `NOTICE TO THE PRINCIPAL IS NOTICE TO THE AGENT. A commercial maritime lien is hereby established against {{Debtor_Name}} in favor of the Claimant, {{Claimant_Name}}, for the sum of {{Lien_Amount}}.\n\nThis claim arises from the following breach: {{Basis_of_Claim}}. Failure to rebut this claim point-for-point by verified affidavit within 30 days shall constitute an admission of fault and a default judgment in commerce.`
                 }
             ]
         }
@@ -132,61 +138,41 @@ createApp({
         },
         generatePDF() {
             const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-            
-            // Background & Red Line
             doc.setFillColor(255, 255, 255); doc.rect(0, 0, 210, 297, 'F');
             doc.setDrawColor(180, 0, 0); doc.setLineWidth(0.6); doc.line(26, 15, 26, 282); 
 
-            // Logo with fixed spacing
             if (this.customLogo) doc.addImage(this.customLogo, 'PNG', 85, 12, 40, 40);
-            
-            // Title - High Weight Ink
             doc.setFont("times", "bold"); doc.setFontSize(28); doc.setTextColor(0);
             doc.text("INSTRUMENT OF RECORD", 105, 62, { align: "center" });
             doc.setLineWidth(1.2); doc.line(65, 65, 145, 65);
 
-            // Subtitle
-            doc.setFontSize(16);
-            doc.text(this.selectedTemplate.name.toUpperCase(), 105, 78, { align: "center" });
+            doc.setFontSize(16); doc.text(this.selectedTemplate.name.toUpperCase(), 105, 78, { align: "center" });
 
-            // Body Text - Dynamic Placement to prevent overlap
             doc.setFont("times", "normal"); doc.setFontSize(14); 
             const splitText = doc.splitTextToSize(this.processedBody, 150); 
-            
-            // Standardizing the Y start point to ensure it never hits the header
             let currentY = 95;
             doc.text(splitText, 35, currentY, { align: 'justify', lineHeightFactor: 1.5 });
 
-            // Signature Logic (Calculating position based on text length)
-            const textHeight = (splitText.length * 1.5 * doc.internal.getFontSize()) / 2.83465; // Convert pts to mm
+            const textHeight = (splitText.length * 1.5 * doc.internal.getFontSize()) / 2.83465;
             let sigY = Math.max(currentY + textHeight + 25, 245); 
 
-            // If text is too long, push signatures to next page
-            if (sigY > 275) {
-                doc.addPage();
-                doc.setDrawColor(180, 0, 0); doc.setLineWidth(0.6); doc.line(26, 15, 26, 282); 
-                sigY = 60;
-            }
+            if (sigY > 275) { doc.addPage(); sigY = 60; doc.line(26, 15, 26, 282); }
 
-            // High Contrast Signatures
             doc.setDrawColor(0); doc.setLineWidth(0.5);
-            doc.setTextColor(0, 0, 100); doc.setFont("times", "italic"); doc.setFontSize(24);
+            doc.setTextColor(0, 0, 120); doc.setFont("times", "italic"); doc.setFontSize(26);
             doc.text(this.formData.Primary_Signer || "", 35, sigY);
             doc.text(this.formData.Witness_Signer || "", 115, sigY);
-            
             doc.line(35, sigY + 2, 95, sigY + 2);
             doc.line(115, sigY + 2, 185, sigY + 2);
             
             doc.setTextColor(0); doc.setFont("times", "bold"); doc.setFontSize(9);
-            doc.text("PRIMARY DECLARANT", 35, sigY + 7);
-            doc.text("ATTESTING WITNESS", 115, sigY + 7);
+            doc.text("GRANTOR / SELLER", 35, sigY + 7);
+            doc.text("WITNESS / NOTARY", 115, sigY + 7);
 
-            // The Seal
-            doc.setDrawColor(150, 0, 0); doc.setLineWidth(1.5);
-            doc.circle(105, sigY - 5, 18);
+            doc.setDrawColor(150, 0, 0); doc.setLineWidth(1.5); doc.circle(105, sigY - 5, 18);
             doc.setFontSize(6); doc.setTextColor(150, 0, 0);
-            doc.text("OFFICIAL SEAL", 105, sigY - 8, {align: "center"});
-            doc.text("ORIGINAL", 105, sigY - 4, {align: "center"});
+            doc.text("CERTIFIED", 105, sigY - 7, {align: "center"});
+            doc.text("TRANSFER", 105, sigY - 3, {align: "center"});
 
             doc.save(`${this.selectedTemplate.name}.pdf`);
         }
@@ -194,5 +180,4 @@ createApp({
 }).mount('#app');
 </script>
 </body>
-        </html>
-        
+</html>
